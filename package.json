@@ -1,0 +1,17 @@
+{
+  "name": "legohandbot",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "shared-types"
+  ],
+  "scripts": {
+    "dev": "concurrently -n backend,frontend -c blue,green \"yarn dev:backend\" \"yarn dev:frontend\"",
+    "dev:frontend": "yarn workspace frontend dev",
+    "dev:backend": "yarn workspace backend dev"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

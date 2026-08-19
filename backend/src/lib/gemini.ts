@@ -12,19 +12,36 @@ export type GenerateOptions = {
     contents: { role: "user" | "model"; parts: { text: string }[] }[];
     /** Nutzt das leichte Modell (z. B. für die Relevanzprüfung) statt des Hauptmodells. */
     light?: boolean;
+    /** Client-Disconnect etc. — nur clientseitige Abbruch-Semantik laut SDK-Doku. */
+    abortSignal?: AbortSignal;
 };
 
 /**
- * Ein einfacher, nicht-streamender generateContent-Call. Streaming ist Aufgabe der
- * Route (SSE), sobald es eine gibt — die Pipeline-Steps bleiben reine Funktionen,
- * die den fertigen Text zurückgeben.
+ * Ein einfacher, nicht-streamender generateContent-Call — für die Relevanzprüfung,
+ * die ohnehin nur ein kurzes true/false zurückgibt.
  */
-export async function generateText({ systemInstruction, contents, light }: GenerateOptions): Promise<string> {
+export async function generateText({ systemInstruction, contents, light, abortSignal }: GenerateOptions): Promise<string> {
     const response = await ai.models.generateContent({
         model: light ? MODEL_LIGHT : MODEL,
-        config: { systemInstruction },
+        config: { systemInstruction, abortSignal },
         contents,
     });
 
     return response.text ?? "";
+}
+
+/**
+ * Streamende Variante für die eigentliche Antwortgenerierung: gibt Text-Chunks
+ * aus, sobald Gemini sie liefert, statt auf die komplette Antwort zu warten.
+ */
+export async function* generateTextStream({ systemInstruction, contents, light, abortSignal }: GenerateOptions): AsyncGenerator<string> {
+    const stream = await ai.models.generateContentStream({
+        model: light ? MODEL_LIGHT : MODEL,
+        config: { systemInstruction, abortSignal },
+        contents,
+    });
+
+    for await (const chunk of stream) {
+        if (chunk.text) yield chunk.text;
+    }
 }

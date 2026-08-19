@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { PipelineStep } from "shared-types";
-import { generateText } from "./lib/gemini";
+import { generateText, generateTextStream } from "./lib/gemini";
 import { RELEVANCE_CHECK_PROMPT, SYSTEM_PROMPT } from "./prompts";
 
 const REFUSAL_RESPONSE =
@@ -31,7 +31,7 @@ function loadGesetzbuchText(): string {
         // Pfad relativ zu process.cwd() statt __dirname/import.meta.url: tsc kopiert
         // die .md nicht nach dist/, aber sowohl `tsx watch src/index.ts` als auch
         // `node dist/index.js` laufen mit backend/ als cwd (Yarn-Workspace-Skripte).
-        const path = join(process.cwd(), "src/LegohandGesetzbuch.md");
+        const path = join(process.cwd(), "src/Legohand_Gesetzbuch_Camping.md");
         gesetzbuchTextCache = readFileSync(path, "utf-8");
     }
     return gesetzbuchTextCache;
@@ -49,6 +49,7 @@ export const ReadLegohandGesetzbuch: PipelineStep = async (context) => {
 
 export const AnswerQuestion: PipelineStep = async (context) => {
     if (context.isRelevant === false) {
+        context.onToken?.(REFUSAL_RESPONSE);
         return { ...context, response: REFUSAL_RESPONSE };
     }
 
@@ -59,10 +60,17 @@ export const AnswerQuestion: PipelineStep = async (context) => {
         parts: [{ text: turn.text }],
     }));
 
-    const response = await generateText({
+    // Chunks direkt weiterreichen (SSE), am Ende trotzdem die volle Antwort im
+    // Context behalten — für Konsumenten von runPipeline ohne onToken (z. B. Evals).
+    let response = "";
+    for await (const token of generateTextStream({
         systemInstruction,
         contents: [...history, { role: "user", parts: [{ text: context.query }] }],
-    });
+        abortSignal: context.signal,
+    })) {
+        response += token;
+        context.onToken?.(token);
+    }
 
     return { ...context, response };
 };

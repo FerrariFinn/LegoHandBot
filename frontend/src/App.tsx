@@ -1,27 +1,21 @@
 import { useState, useRef, useEffect } from "react";
+import type { ChatRequest, ChatResponse } from "shared-types";
 
 // =====================================================================
 // UI-KONZEPT: Lego-Gesetzbuch Chatbot
 // Bewusst ungestylt — nur Struktur & Verhalten. Design kommt von dir.
-// Streaming ist hier gemockt; im echten Frontend ersetzt useChatStream
-// (SSE gegen POST /api/chat) die fakeStream-Funktion.
+// Die Antwort kommt bereits von POST /api/chat; da der Backend-Response
+// noch kein SSE-Streaming liefert, wird sie nach Erhalt hier per
+// fakeStream token-weise "nachgestreamt".
 // =====================================================================
 
-const MOCK_ANSWER =
-  "Nach § 12 Abs. 2 ist das Zerlegen fremder Bauwerke ohne Zustimmung des Erbauers unzulässig. Eine Ausnahme gilt nach § 14, wenn das Bauwerk die gemeinsame Bauplatte blockiert. Im vorliegenden Fall greift die Ausnahme nicht, da die Blockade nicht nachgewiesen wurde.";
-
-const MOCK_SOURCES = [
-  { paragraph: "§ 12", title: "Schutz fremder Bauwerke" },
-  { paragraph: "§ 14", title: "Ausnahmen bei Plattenblockade" },
-];
-
-function fakeStream(onToken, onDone) {
-  const tokens = MOCK_ANSWER.split(" ");
+function fakeStream(text, onToken, onDone) {
+  const tokens = text.split(" ");
   let i = 0;
   const interval = setInterval(() => {
     if (i >= tokens.length) {
       clearInterval(interval);
-      onDone(MOCK_SOURCES);
+      onDone();
       return;
     }
     onToken(tokens[i] + " ");
@@ -41,9 +35,11 @@ export default function App() {
     bottomRef.current?.scrollIntoView();
   }, [messages]);
 
-  function send() {
+  async function send() {
     const text = input.trim();
     if (!text || streaming) return;
+
+    const history = messages.map(({ role, text }) => ({ role, text }));
 
     setMessages((m) => [
       ...m,
@@ -53,26 +49,46 @@ export default function App() {
     setInput("");
     setStreaming(true);
 
-    fakeStream(
-      (token) => {
-        setMessages((m) => {
-          const copy = [...m];
-          copy[copy.length - 1] = {
-            ...copy[copy.length - 1],
-            text: copy[copy.length - 1].text + token,
-          };
-          return copy;
-        });
-      },
-      (sources) => {
-        setMessages((m) => {
-          const copy = [...m];
-          copy[copy.length - 1] = { ...copy[copy.length - 1], sources };
-          return copy;
-        });
+    const appendToken = (token) => {
+      setMessages((m) => {
+        const copy = [...m];
+        copy[copy.length - 1] = {
+          ...copy[copy.length - 1],
+          text: copy[copy.length - 1].text + token,
+        };
+        return copy;
+      });
+    };
+
+    const setErrorText = (errorText) => {
+      setMessages((m) => {
+        const copy = [...m];
+        copy[copy.length - 1] = { ...copy[copy.length - 1], text: errorText };
+        return copy;
+      });
+    };
+
+    try {
+      const requestBody: ChatRequest = { query: text, history };
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setErrorText(`Fehler: ${data.error ?? "Unbekannter Fehler"}`);
         setStreaming(false);
+        return;
       }
-    );
+
+      const chatResponse: ChatResponse = data;
+      fakeStream(chatResponse.response, appendToken, () => setStreaming(false));
+    } catch (err) {
+      setErrorText("Fehler beim Abrufen der Antwort.");
+      setStreaming(false);
+    }
   }
 
   return (
@@ -143,7 +159,7 @@ export default function App() {
           value={input}
           placeholder={
             mode === "frage"
-              ? "z. B. Was sagt das Gesetz zu fremden Bauwerken?"
+              ? "z. B. Wann wird man mit der Malzratsbestrafung zur rechenschaft gezogen?"
               : "Fall schildern..."
           }
           onChange={(e) => setInput(e.target.value)}

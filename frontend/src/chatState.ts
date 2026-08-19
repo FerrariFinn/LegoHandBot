@@ -1,5 +1,5 @@
-import type { ChatSource } from "shared-types";
-import type { ChatMode, UIMessage } from "./types";
+import type { ChatMode, ChatSource } from "shared-types";
+import type { UIMessage } from "./types";
 
 // =====================================================================
 // Reine Zustandsübergangs-Funktionen für den Nachrichtenverlauf. Kein DOM-

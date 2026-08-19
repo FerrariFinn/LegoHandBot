@@ -1,12 +1,10 @@
-import type { ChatSource } from "shared-types";
+import type { ChatMode, ChatSource } from "shared-types";
 
 // =====================================================================
 // Frontend-lokale Typen. Geteilte Vertragstypen (ChatRequest, ChatSource,
-// ChatStreamEvent) kommen aus shared-types — hier nur, was nur die UI
-// betrifft.
+// ChatStreamEvent, ChatMode) kommen aus shared-types — hier nur, was nur
+// die UI betrifft.
 // =====================================================================
-
-export type ChatMode = "frage" | "fall";
 
 export type UIMessage = {
   role: "user" | "assistant";

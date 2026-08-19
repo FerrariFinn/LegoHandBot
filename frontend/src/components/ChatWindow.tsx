@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import type { ChatMode, UIMessage } from "../types";
+import type { ChatMode } from "shared-types";
+import type { UIMessage } from "../types";
 import MarkdownMessage from "./MarkdownMessage";
 
 // =====================================================================

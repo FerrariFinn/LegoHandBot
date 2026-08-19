@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import type { ChatRequest, ChatSource } from "shared-types";
+import type { ChatMode, ChatRequest, ChatSource } from "shared-types";
 import * as chatState from "./chatState";
 import { streamChat } from "./streamClient";
-import type { ChatMode, UIMessage } from "./types";
+import type { UIMessage } from "./types";
 
 // =====================================================================
 // Orchestriert den Chat-Flow: nimmt Nutzereingaben entgegen, ruft

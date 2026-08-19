@@ -1,5 +1,10 @@
 export type ChatSource = { paragraph: string; title: string };
 
+/** Wählt zwischen den beiden Pipelines (QuestionQuery/CaseQuery, siehe
+ *  backend/src/pipelineController.ts). Wird künftig Teil von ChatRequest,
+ *  sobald CaseQuery implementiert ist. */
+export type ChatMode = "frage" | "fall";
+
 export type PipelineContext = {
     role: "user" | "assistant";
     query: string;

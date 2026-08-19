@@ -93,7 +93,7 @@ export default function App() {
 
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", padding: 16 }}>
-      <h1>Lego-Gesetzbuch Bot</h1>
+      <h1>Bierses</h1>
 
       {/* Modus-Umschalter */}
       <div>
@@ -121,7 +121,10 @@ export default function App() {
       <div style={{ minHeight: 300 }}>
         {messages.length === 0 && (
           <p>
-            Stell eine Frage zum Gesetzbuch oder schilder einen Fall.
+            Ich bin Bierses und weiß alles über das Legohandgesetzbuch. <br/> 
+            Ich kann Fälle lösen oder Fragen zu einzelnen Paragraphen Beantworten. <br/>
+            <br/>
+            Cheers!
           </p>
         )}
         {messages.map((msg, i) => (

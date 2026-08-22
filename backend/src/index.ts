@@ -1,11 +1,11 @@
 import express from "express";
 import cors from "cors";
 import type { PipelineContext } from "shared-types";
-import { QuestionQuery, runPipeline } from "./pipelineController";
-import { startSseResponse } from "./lib/sse";
-import { requireAuth } from "./lib/requireAuth";
-import { chatRateLimit } from "./lib/chatRateLimit";
-import { loadGesetzbuchText } from "./lib/gesetzbuchLoader";
+import { QuestionQuery, runPipeline } from "./pipelineController.js";
+import { startSseResponse } from "./lib/sse.js";
+import { requireAuth } from "./lib/requireAuth.js";
+import { chatRateLimit } from "./lib/chatRateLimit.js";
+import { loadGesetzbuchText } from "./lib/gesetzbuchLoader.js";
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 3001);

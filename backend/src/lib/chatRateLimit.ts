@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { supabaseAsUser } from "./supabaseClient";
+import { supabaseAsUser } from "./supabaseClient.js";
 
 const HOURLY_QUOTA = 5;
 

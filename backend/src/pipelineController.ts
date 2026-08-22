@@ -1,5 +1,5 @@
 import type { PipelineContext, PipelineStep } from "shared-types";
-import { AnswerQuestion, isRelevantQuery, ReadLegohandGesetzbuch } from "./pipelineSteps";
+import { AnswerQuestion, isRelevantQuery, ReadLegohandGesetzbuch } from "./pipelineSteps.js";
 
 export const QuestionQuery: PipelineStep[] = [ isRelevantQuery, ReadLegohandGesetzbuch, AnswerQuestion];
 export const CaseQuery: PipelineStep[] = [];

@@ -1,7 +1,7 @@
 import type { PipelineStep } from "shared-types";
-import { generateText, generateTextStream } from "./lib/gemini";
-import { loadGesetzbuchText } from "./lib/gesetzbuchLoader";
-import { RELEVANCE_CHECK_PROMPT, QUESTION_QUERY_SYSTEM_PROMPT, CASE_QUERY_SYSTEM_PROMPT } from "./prompts";
+import { generateText, generateTextStream } from "./lib/gemini.js";
+import { loadGesetzbuchText } from "./lib/gesetzbuchLoader.js";
+import { RELEVANCE_CHECK_PROMPT, QUESTION_QUERY_SYSTEM_PROMPT, CASE_QUERY_SYSTEM_PROMPT } from "./prompts.js";
 
 const REFUSAL_RESPONSE =
     "Bro — Mich interressiert nur Bier und wie schnell der Legohandhalter es bekommt.";

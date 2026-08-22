@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import type { User } from "@supabase/supabase-js";
-import { supabase } from "./supabaseClient";
+import { supabase } from "./supabaseClient.js";
 
 declare global {
   namespace Express {

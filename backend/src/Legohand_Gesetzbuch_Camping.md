@@ -258,7 +258,7 @@ Das bewusste Abstimmen oder Verabreden mehrerer Personen mit dem Ziel, Legohänd
 
 ### §13. Allgegenwärtigkeitsklausel
 
-Leon ist gay
+Bier muss getrunken werden
 
 ---
 

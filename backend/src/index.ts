@@ -10,7 +10,10 @@ import { loadGesetzbuchText } from "./lib/gesetzbuchLoader";
 const app = express();
 const PORT = Number(process.env.PORT ?? 3001);
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+}));
+
 app.use(express.json());
 
 // Health-Check — dient hier nur zum lokalen Testen des Grundgerüsts.

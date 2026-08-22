@@ -1,8 +1,7 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import type { PipelineStep } from "shared-types";
 import { generateText, generateTextStream } from "./lib/gemini";
-import { RELEVANCE_CHECK_PROMPT, SYSTEM_PROMPT } from "./prompts";
+import { loadGesetzbuchText } from "./lib/gesetzbuchLoader";
+import { RELEVANCE_CHECK_PROMPT, QUESTION_QUERY_SYSTEM_PROMPT, CASE_QUERY_SYSTEM_PROMPT } from "./prompts";
 
 const REFUSAL_RESPONSE =
     "Bro — Mich interressiert nur Bier und wie schnell der Legohandhalter es bekommt.";
@@ -22,21 +21,6 @@ export const isRelevantQuery: PipelineStep = async (context) => {
     return { ...context, isRelevant };
 };
 
-// Wird beim ersten Zugriff einmalig eingelesen und danach im Modul-Scope
-// zwischengespeichert — die Datei ändert sich zur Laufzeit nicht (Phase 0).
-let gesetzbuchTextCache: string | undefined;
-
-function loadGesetzbuchText(): string {
-    if (gesetzbuchTextCache === undefined) {
-        // Pfad relativ zu process.cwd() statt __dirname/import.meta.url: tsc kopiert
-        // die .md nicht nach dist/, aber sowohl `tsx watch src/index.ts` als auch
-        // `node dist/index.js` laufen mit backend/ als cwd (Yarn-Workspace-Skripte).
-        const path = join(process.cwd(), "src/Legohand_Gesetzbuch_Camping.md");
-        gesetzbuchTextCache = readFileSync(path, "utf-8");
-    }
-    return gesetzbuchTextCache;
-}
-
 export const ReadLegohandGesetzbuch: PipelineStep = async (context) => {
     // Irrelevante Fragen sollen die Antwort-Stufe gar nicht erst erreichen, also
     // lohnt sich auch das Einlesen (bzw. der erste Cache-Fill) hier nicht.
@@ -53,7 +37,7 @@ export const AnswerQuestion: PipelineStep = async (context) => {
         return { ...context, response: REFUSAL_RESPONSE };
     }
 
-    const systemInstruction = `${SYSTEM_PROMPT}\n\n${context.gesetzbuchText ?? ""}`;
+    const systemInstruction = context.chatmode === "frage" ? `${QUESTION_QUERY_SYSTEM_PROMPT}\n\n${context.gesetzbuchText ?? ""}` : `${CASE_QUERY_SYSTEM_PROMPT}\n\n${context.gesetzbuchText ?? ""}`;
 
     const history = (context.history ?? []).map((turn) => ({
         role: turn.role === "assistant" ? ("model" as const) : ("user" as const),

@@ -1,7 +1,7 @@
 import type { ChatMode, ChatSource } from "shared-types";
 
 // =====================================================================
-// Frontend-lokale Typen. Geteilte Vertragstypen (ChatRequest, ChatSource,
+// Frontend-lokale Typen. Geteilte Vertragstypen (PipelineContext, ChatSource,
 // ChatStreamEvent, ChatMode) kommen aus shared-types — hier nur, was nur
 // die UI betrifft.
 // =====================================================================

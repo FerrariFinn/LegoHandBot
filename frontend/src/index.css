@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+/* Design-Tokens 1:1 aus dem bisherigen Inline-Styling übernommen. */
+@theme {
+  --font-serif: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: monospace;
+
+  --color-gold: #f3cb49;
+  --color-bubble-user: #ebeef3;
+  --color-input-border: #ccc;
+  --color-code-bg: rgba(0, 0, 0, 0.08);
+  --color-blockquote-border: rgba(0, 0, 0, 0.2);
+  --color-link: #2563eb;
+  --color-error: #dc2626;
+  --color-muted: #4b5563;
+
+  --radius-bubble: 12px;
+  --radius-code: 4px;
+}

@@ -1,61 +1,68 @@
-import logo from "../assets/Logo.png";
+import { useEffect, useState } from "react";
+import type { Session } from "@supabase/supabase-js";
 import ChatWindow from "./components/ChatWindow";
+import Header from "./components/Header";
+import LhgbView from "./components/LhgbView";
+import LoginPage from "./components/LoginPage";
 import { useChatController } from "./chatController";
+import { supabase } from "./lib/supabaseClient";
 
 export default function App() {
-  const { messages, input, setInput, mode, setMode, streaming, send } =
+  const { messages, input, setInput, mode, setMode, streaming, send, newChat } =
     useChatController();
 
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setLoading(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  function handleLogout() {
+    supabase.auth.signOut();
+  }
+
+  if (loading) {
+    return null;
+  }
+
+  if (!session) {
+    return <LoginPage />;
+  }
+
   return (
-    <div
-      style={{
-        maxWidth: 640,
-        margin: "0 auto",
-        padding: 16,
-        fontFamily: '"Times New Roman", Times, serif',
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <h1>BIERSES</h1>
-        <img src={logo} alt="Logo" style={{ height: 80 }} />
-      </div>
-
-      {/* Modus-Umschalter */}
-      <div>
-        <label>
-          <input
-            type="radio"
-            checked={mode === "frage"}
-            onChange={() => setMode("frage")}
-          />{" "}
-          Frage stellen
-        </label>{" "}
-        <label>
-          <input
-            type="radio"
-            checked={mode === "fall"}
-            onChange={() => setMode("fall")}
-          />{" "}
-          Fall lösen
-        </label>
-      </div>
-
-      <hr />
-
-      <ChatWindow
-        messages={messages}
-        input={input}
-        setInput={setInput}
+    <div className="mx-auto flex max-w-[640px] flex-col gap-4 p-4 font-serif">
+      <Header
+        onLogout={handleLogout}
         mode={mode}
-        streaming={streaming}
-        send={send}
+        setMode={setMode}
+        canStartNewChat={messages.length > 0}
+        onNewChat={newChat}
       />
+
+      {mode === "lhgb" ? (
+        <LhgbView />
+      ) : (
+        <ChatWindow
+          messages={messages}
+          input={input}
+          setInput={setInput}
+          mode={mode}
+          streaming={streaming}
+          send={send}
+        />
+      )}
     </div>
   );
 }

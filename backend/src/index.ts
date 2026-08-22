@@ -1,8 +1,11 @@
 import express from "express";
 import cors from "cors";
-import type { ChatRequest } from "shared-types";
+import type { PipelineContext } from "shared-types";
 import { QuestionQuery, runPipeline } from "./pipelineController";
 import { startSseResponse } from "./lib/sse";
+import { requireAuth } from "./lib/requireAuth";
+import { chatRateLimit } from "./lib/chatRateLimit";
+import { loadGesetzbuchText } from "./lib/gesetzbuchLoader";
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 3001);
@@ -15,8 +18,8 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-app.post("/api/chat", async (req, res) => {
-  const { query, history } = req.body as ChatRequest;
+app.post("/api/chat", requireAuth, chatRateLimit, async (req, res) => {
+  const { query, history, chatmode } = req.body as PipelineContext;
 
   if (typeof query !== "string" || query.trim() === "") {
     res.status(400).json({ error: "query ist erforderlich" });
@@ -29,6 +32,7 @@ app.post("/api/chat", async (req, res) => {
   const result = await runPipeline(QuestionQuery, {
     role: "user",
     query,
+    chatmode: chatmode ?? "frage",
     history,
     onToken: (token) => sendEvent({ event: "token", data: { text: token } }),
     signal,
@@ -40,6 +44,13 @@ app.post("/api/chat", async (req, res) => {
     sendEvent({ event: "done", data: { sources: result.sources ?? null } });
   }
   res.end();
+});
+
+// Liefert den vollen Gesetzbuchtext an den LHGB-Tab im Frontend — statisch
+// und ungefiltert (im Gegensatz zu /api/chat kein LLM-Call, daher kein
+// chatRateLimit), aber trotzdem hinter requireAuth wie /api/chat.
+app.get("/api/lhgb", requireAuth, (_req, res) => {
+  res.json({ text: loadGesetzbuchText() });
 });
 
 app.listen(PORT, () => {

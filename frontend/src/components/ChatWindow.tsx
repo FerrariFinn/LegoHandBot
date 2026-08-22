@@ -2,6 +2,10 @@ import { useEffect, useRef } from "react";
 import type { ChatMode } from "shared-types";
 import type { UIMessage } from "../types";
 import MarkdownMessage from "./MarkdownMessage";
+import { Card } from "./ui/Card";
+import { Button } from "./ui/Button";
+import { Textarea } from "./ui/Textarea";
+import { cn } from "../lib/utils";
 
 // =====================================================================
 // Rein präsentational: Nachrichtenverlauf + Eingabeformular. Nimmt Zustand
@@ -33,45 +37,32 @@ export default function ChatWindow({
   return (
     <>
       {/* Nachrichtenverlauf */}
-      <div style={{ minHeight: 300 }}>
+      <div className="min-h-[300px]">
         {messages.length === 0 && (
-          <div
-            style={{
-              maxWidth: "75%",
-              padding: "8px 12px",
-              borderRadius: 12,
-              background: "#f3cb49",
-              fontFamily: "monospace",
-              display: "flex",
-            }}
-          >
+          <Card sender="bot" className="flex">
             <p>
-              Ich bin Bierses und weiß alles über das Legohandgesetzbuch. <br />
-              Ich kann Fälle lösen oder Fragen zu einzelnen Paragraphen Beantworten. <br />
+              Ich bin Bierses. <br />
+              Ich weiß alles über das Legohandgesetzbuch. <br />
+              {mode === "frage" ? (
+                <>Ich kann Fragen zu einzelnen Paragraphen Beantworten. <br /></>
+              ) : (
+                <>Ich kann Fälle lösen. <br /></>
+              )}
               <br />
               Cheers!
             </p>
-          </div>
+          </Card>
         )}
         {messages.map((msg, i) => (
           <div
             key={i}
-            style={{
-              display: "flex",
-              justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
-              marginBottom: 12,
-            }}
+            className={cn(
+              "flex mb-3",
+              msg.role === "user" ? "justify-end" : "justify-start"
+            )}
           >
-            <div
-              style={{
-                maxWidth: "75%",
-                padding: "8px 12px",
-                borderRadius: 12,
-                background: msg.role === "user" ? "#ebeef3" : "#f3cb49",
-                fontFamily: "monospace",
-              }}
-            >
-              <b>{msg.role === "user" ? "Du" : "Bot"}:</b>{" "}
+            <Card sender={msg.role === "user" ? "user" : "bot"}>
+              <b>{msg.role === "user" ? "Du" : "Bierses"}:</b>{" "}
               {msg.mode === "fall" && msg.role === "user" && <i>[Fall] </i>}
               <MarkdownMessage text={msg.text} />
               {msg.sources && (
@@ -89,24 +80,21 @@ export default function ChatWindow({
                   </small>
                 </div>
               )}
-            </div>
+            </Card>
           </div>
         ))}
         <div ref={bottomRef} />
       </div>
 
-      <hr />
-
       {/* Eingabe */}
-      <div>
-        <textarea
+      <div className="flex flex-col gap-2">
+        <Textarea
           rows={3}
-          style={{ width: "100%" }}
           value={input}
           placeholder={
             mode === "frage"
               ? "z. B. Wann wird man mit der Malzratsbestrafung zur rechenschaft gezogen?"
-              : "Fall schildern..."
+              : "Beschreibe deinen Fall..."
           }
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
@@ -116,9 +104,9 @@ export default function ChatWindow({
             }
           }}
         />
-        <button onClick={send} disabled={streaming || !input.trim()}>
+        <Button variant="secondary" onClick={send} disabled={streaming || !input.trim()}>
           {streaming ? "..." : "Senden"}
-        </button>
+        </Button>
       </div>
     </>
   );

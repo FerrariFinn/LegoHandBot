@@ -1,10 +1,11 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
+import { markdownHeadingComponents } from "./markdownHeadings";
 
 // =====================================================================
 // Rendert gestreamten Markdown-Text (Gemini gibt oft ##/**bold**/Listen
-// aus, siehe SYSTEM_PROMPT in backend/src/prompts.ts) als echte React-
+// aus, siehe QUESTION_QUERY_SYSTEM_PROMPT in backend/src/prompts.ts) als echte React-
 // Elemente statt als rohen String. Kein dangerouslySetInnerHTML, kein
 // rehype-raw — es wird nie rohes HTML aus dem Modell-Output gerendert.
 //
@@ -13,62 +14,40 @@ import remarkBreaks from "remark-breaks";
 // geschlossenes "**") wird schlicht als literaler Text angezeigt, bis
 // der schließende Marker eintrifft — kein Sonderfall nötig.
 //
-// Styling folgt der Projekt-Konvention "keine CSS-Datei, alles inline"
-// (siehe App.tsx) statt einer eigenen Stylesheet-Datei.
+// Styling erfolgt über Tailwind-Utilities + die Heading-ui-Komponente
+// statt eigener Inline-Style-Objekte (siehe Tailwind-Migrationsplan).
+// list-disc/list-decimal und die Link-Farbe kompensieren Tailwinds
+// Preflight-Reset (der sonst Listensymbole und Link-Styling entfernt).
 // =====================================================================
-
-const headingStyle = (size: string) => ({
-  margin: "8px 0 4px",
-  fontSize: size,
-  fontFamily: "monospace",
-});
 
 export default function MarkdownMessage({ text }: { text: string }) {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm, remarkBreaks]}
       components={{
-        h1: ({ children }) => <h1 style={headingStyle("1.3em")}>{children}</h1>,
-        h2: ({ children }) => <h2 style={headingStyle("1.15em")}>{children}</h2>,
-        h3: ({ children }) => <h3 style={headingStyle("1.05em")}>{children}</h3>,
-        h4: ({ children }) => <h4 style={headingStyle("1em")}>{children}</h4>,
-        p: ({ children }) => <p style={{ margin: "4px 0" }}>{children}</p>,
+        ...markdownHeadingComponents,
+        p: ({ children }) => <p className="my-1">{children}</p>,
         ul: ({ children }) => (
-          <ul style={{ margin: "4px 0", paddingLeft: 20 }}>{children}</ul>
+          <ul className="my-1 list-disc pl-5">{children}</ul>
         ),
         ol: ({ children }) => (
-          <ol style={{ margin: "4px 0", paddingLeft: 20 }}>{children}</ol>
+          <ol className="my-1 list-decimal pl-5">{children}</ol>
         ),
-        li: ({ children }) => <li style={{ margin: "2px 0" }}>{children}</li>,
-        strong: ({ children }) => (
-          <strong style={{ fontWeight: "bold" }}>{children}</strong>
-        ),
+        li: ({ children }) => <li className="my-0.5">{children}</li>,
+        strong: ({ children }) => <strong className="font-bold">{children}</strong>,
         em: ({ children }) => <em>{children}</em>,
         code: ({ children }) => (
-          <code
-            style={{
-              background: "rgba(0, 0, 0, 0.08)",
-              padding: "1px 4px",
-              borderRadius: 4,
-              fontFamily: "monospace",
-            }}
-          >
+          <code className="rounded-code bg-code-bg px-1 py-px font-mono">
             {children}
           </code>
         ),
         a: ({ href, children }) => (
-          <a href={href} style={{ fontFamily: "monospace" }}>
+          <a href={href} className="font-serif text-link underline">
             {children}
           </a>
         ),
         blockquote: ({ children }) => (
-          <blockquote
-            style={{
-              margin: "4px 0",
-              paddingLeft: 10,
-              borderLeft: "3px solid rgba(0, 0, 0, 0.2)",
-            }}
-          >
+          <blockquote className="my-1 border-l-[3px] border-blockquote-border pl-2.5">
             {children}
           </blockquote>
         ),

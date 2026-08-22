@@ -14,7 +14,7 @@ Max-Brauer-Allee 271, 22769, Hamburg, Deutschland
 **Redaktion:** Spinne, 9er
 **Satz und Druck:** Spinne, 9er
 **Umschlaggestaltung:** Spinne, 9er
-**ISBN:** 49-176-632-062-30
+**ISBN:** 49-Merles Telefonnummer
 **www.sterni2.de**
 
 ---

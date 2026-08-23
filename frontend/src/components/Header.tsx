@@ -33,13 +33,13 @@ export default function Header({
 
   return (
     <div className="sticky top-0 z-20 flex flex-col bg-white px-4 py-3">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
         <Heading variant="brand" className="my-0">
           Frag BIERSES
         </Heading>
-        <div className="flex flex-col items-end">
-          <img src={logo} alt="Logo" className="h-20 translate-y-3" />
-          <div className="flex items-center gap-2 translate-y-8">
+        <div className="flex flex-col items-end gap-1">
+          <img src={logo} alt="Logo" className="h-14 sm:h-20" />
+          <div className="flex items-center gap-2">
             {/* Setzt nur den Verlauf des aktuell aktiven Tabs zurück; erst
                 sichtbar, sobald es in diesem Tab etwas zum Zurücksetzen gibt. */}
             {canStartNewChat && (

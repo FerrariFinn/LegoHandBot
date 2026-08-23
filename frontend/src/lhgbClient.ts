@@ -1,5 +1,6 @@
 import type { LhgbResponse } from "shared-types";
 import { supabase } from "./lib/supabaseClient";
+import { apiUrl } from "./lib/apiBase";
 
 // =====================================================================
 // GET /api/lhgb liefert den kompletten Gesetzbuchtext als einzelnes JSON,
@@ -17,7 +18,7 @@ export async function fetchLhgbText(): Promise<string> {
     headers.Authorization = `Bearer ${session.access_token}`;
   }
 
-  const res = await fetch("/api/lhgb", { headers });
+  const res = await fetch(apiUrl("/api/lhgb"), { headers });
   if (!res.ok) {
     throw new Error(`Fehler beim Laden des Gesetzbuchs (HTTP ${res.status}).`);
   }

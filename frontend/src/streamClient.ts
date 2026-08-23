@@ -1,5 +1,6 @@
 import type { ChatSource, ChatStreamEvent, PipelineContext } from "shared-types";
 import { supabase } from "./lib/supabaseClient";
+import { apiUrl } from "./lib/apiBase";
 
 // =====================================================================
 // POST /api/chat liefert echtes SSE-Streaming (siehe backend/src/index.ts).
@@ -81,7 +82,7 @@ export async function streamChat(
       headers.Authorization = `Bearer ${session.access_token}`;
     }
 
-    const res = await fetch("/api/chat", {
+    const res = await fetch(apiUrl("/api/chat"), {
       method: "POST",
       headers,
       body: JSON.stringify(request),

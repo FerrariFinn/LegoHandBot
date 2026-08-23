@@ -37,6 +37,7 @@ app.post("/api/chat", requireAuth, chatRateLimit, async (req, res) => {
     query,
     chatmode: chatmode ?? "frage",
     history,
+    token: req.token,
     onToken: (token) => sendEvent({ event: "token", data: { text: token } }),
     signal,
   });
@@ -52,8 +53,14 @@ app.post("/api/chat", requireAuth, chatRateLimit, async (req, res) => {
 // Liefert den vollen Gesetzbuchtext an den LHGB-Tab im Frontend — statisch
 // und ungefiltert (im Gegensatz zu /api/chat kein LLM-Call, daher kein
 // chatRateLimit), aber trotzdem hinter requireAuth wie /api/chat.
-app.get("/api/lhgb", requireAuth, (_req, res) => {
-  res.json({ text: loadGesetzbuchText() });
+app.get("/api/lhgb", requireAuth, async (req, res) => {
+  try {
+    const text = await loadGesetzbuchText(req.token!);
+    res.json({ text });
+  } catch (err) {
+    console.error("Gesetzbuch-Ladefehler:", err);
+    res.status(500).json({ error: "Gesetzbuch konnte nicht geladen werden" });
+  }
 });
 
 app.listen(PORT, () => {

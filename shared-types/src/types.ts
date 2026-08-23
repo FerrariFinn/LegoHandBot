@@ -14,6 +14,9 @@ export type PipelineContext = {
     sources?: ChatSource[] | null;
     isRelevant?: boolean;
     gesetzbuchText?: string;
+    /** Access-Token des anfragenden Nutzers — wird für Supabase-Storage-Zugriffe
+     *  (z. B. gesetzbuchLoader) durchgereicht, siehe requireAuth.ts/index.ts. */
+    token?: string;
     error?: string;
     /** Wird pro empfangenem Gemini-Chunk aufgerufen — Transport (SSE) ist Aufgabe der Route. */
     onToken?: (token: string) => void;

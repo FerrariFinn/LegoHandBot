@@ -28,7 +28,7 @@ export const ReadLegohandGesetzbuch: PipelineStep = async (context) => {
         return context;
     }
 
-    return { ...context, gesetzbuchText: loadGesetzbuchText() };
+    return { ...context, gesetzbuchText: await loadGesetzbuchText(context.token!) };
 };
 
 export const AnswerQuestion: PipelineStep = async (context) => {

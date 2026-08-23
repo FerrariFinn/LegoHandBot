@@ -1,19 +1,31 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { supabaseAsUser } from "./supabaseClient.js";
 
-// Wird beim ersten Zugriff einmalig eingelesen und danach im Modul-Scope
-// zwischengespeichert — die Datei ändert sich zur Laufzeit nicht (Phase 0).
+// Liegt im privaten Supabase-Storage-Bucket "LegohandGesetzbuch" (RLS: nur
+// authenticated darf lesen, siehe backend/sql/gesetzbuch_storage_policy.sql)
+// statt im Repo — deshalb der Fetch über den Nutzer-Token statt readFileSync.
+const BUCKET = "LegohandGesetzbuch";
+const OBJECT_PATH = "Legohand_Gesetzbuch_Camping.md";
+
+// Wird beim ersten Zugriff einmalig geladen und danach im Modul-Scope
+// zwischengespeichert — der Inhalt ändert sich zur Laufzeit nicht (Phase 0)
+// und ist unabhängig davon, wessen Token den Erstabruf ausgelöst hat.
 // Eigenes Modul statt Teil von pipelineSteps.ts, damit auch die /api/lhgb-
-// Route (index.ts) denselben Cache nutzt statt die Datei doppelt zu lesen.
+// Route (index.ts) denselben Cache nutzt statt die Datei doppelt zu laden.
 let gesetzbuchTextCache: string | undefined;
 
-export function loadGesetzbuchText(): string {
+export async function loadGesetzbuchText(token: string): Promise<string> {
     if (gesetzbuchTextCache === undefined) {
-        // Pfad relativ zu process.cwd() statt __dirname/import.meta.url: tsc kopiert
-        // die .md nicht nach dist/, aber sowohl `tsx watch src/index.ts` als auch
-        // `node dist/index.js` laufen mit backend/ als cwd (Yarn-Workspace-Skripte).
-        const path = join(process.cwd(), "src/Legohand_Gesetzbuch_Camping.md");
-        gesetzbuchTextCache = readFileSync(path, "utf-8");
+        const { data, error } = await supabaseAsUser(token)
+            .storage.from(BUCKET)
+            .download(OBJECT_PATH);
+
+        if (error || !data) {
+            throw new Error(
+                `Gesetzbuch konnte nicht aus Supabase Storage geladen werden: ${error?.message ?? "unbekannter Fehler"}`
+            );
+        }
+
+        gesetzbuchTextCache = await data.text();
     }
     return gesetzbuchTextCache;
 }

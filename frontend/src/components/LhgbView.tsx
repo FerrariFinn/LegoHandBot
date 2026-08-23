@@ -21,7 +21,17 @@ export default function LhgbView() {
   useEffect(() => {
     fetchLhgbText()
       .then(setText)
-      .catch(() => setError("Fehler beim Laden des Gesetzbuchs."));
+      .catch((err) => {
+        // Vorher wurde der echte Fehler verschluckt, was Diagnose in
+        // Produktion (CORS-Block, Netzwerkfehler, HTTP-Status) unmöglich
+        // machte — daher hier geloggt statt nur eine generische Meldung.
+        console.error("LHGB-Ladefehler:", err);
+        setError(
+          err instanceof Error
+            ? `Fehler beim Laden des Gesetzbuchs: ${err.message}`
+            : "Fehler beim Laden des Gesetzbuchs."
+        );
+      });
   }, []);
 
   if (error) return <p className="text-error">{error}</p>;

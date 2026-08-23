@@ -19,7 +19,7 @@ export async function fetchLhgbText(): Promise<string> {
 
   const res = await fetch("/api/lhgb", { headers });
   if (!res.ok) {
-    throw new Error("Fehler beim Laden des Gesetzbuchs.");
+    throw new Error(`Fehler beim Laden des Gesetzbuchs (HTTP ${res.status}).`);
   }
 
   const data = (await res.json()) as LhgbResponse;

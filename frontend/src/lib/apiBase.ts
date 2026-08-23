@@ -8,7 +8,9 @@
 // die absolute Backend-URL über VITE_API_URL zur Build-Zeit.
 // =====================================================================
 
-const API_BASE = import.meta.env.VITE_API_URL ?? "";
+// Trailing Slash abschneiden — sonst entsteht "https://host//api/lhgb" wenn
+// VITE_API_URL (z.B. aus der Browser-Adressleiste kopiert) mit "/" endet.
+const API_BASE = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
 
 export function apiUrl(path: string): string {
   return `${API_BASE}${path}`;

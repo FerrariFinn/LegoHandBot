@@ -5,6 +5,7 @@ export type ChatSource = { paragraph: string; title: string };
  *  Ist Teil von PipelineContext (siehe unten). */
 export type ChatMode = "frage" | "fall" | "lhgb";
 
+
 export type PipelineContext = {
     role: "user" | "assistant";
     query: string;

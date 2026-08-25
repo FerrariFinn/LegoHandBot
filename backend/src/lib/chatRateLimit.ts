@@ -11,7 +11,6 @@ const HOURLY_QUOTA = 5;
 export async function chatRateLimit(
   req: Request,
   res: Response,
-  next: NextFunction
 ) {
   try {
     const client = supabaseAsUser(req.token!);
@@ -22,17 +21,16 @@ export async function chatRateLimit(
     if (error) {
       console.error("Rate-limit check fehlgeschlagen:", error);
       res.status(500).json({ error: "Interner Fehler" });
-      return;
+      return false;
     }
 
     if (data === false) {
       res
         .status(429)
         .json({ error: "Frag nicht so viel, komm in ner Stunde wieder" });
-      return;
+      return false;
     }
 
-    next();
   } catch (err) {
     console.error("Rate-limit check hat geworfen:", err);
     res.status(500).json({ error: "Interner Fehler" });

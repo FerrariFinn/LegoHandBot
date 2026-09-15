@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { PipelineContext } from "shared-types";
-import { startSseResponse } from "./lib/sse";
-import { QuestionQuery, runPipeline } from "./pipelineController";
-import { loadGesetzbuchText } from "./lib/gesetzbuchLoader";
-import { chatRateLimit } from "./lib/chatRateLimit";
+import { startSseResponse } from "./lib/sse.js";
+import { QuestionQuery, runPipeline } from "./pipelineController.js";
+import { loadGesetzbuchText } from "./lib/gesetzbuchLoader.js";
+import { chatRateLimit } from "./lib/chatRateLimit.js";
 
 export const handleChat = async (req: Request, res: Response) => {
 

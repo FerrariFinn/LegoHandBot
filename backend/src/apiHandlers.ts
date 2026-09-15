@@ -7,7 +7,7 @@ import { chatRateLimit } from "./lib/chatRateLimit";
 
 export const handleChat = async (req: Request, res: Response) => {
 
-  if (!chatRateLimit(req, res)) return;
+  if (!(await chatRateLimit(req, res))) return;
   
   const { query, history, chatmode } = req.body as PipelineContext;
 

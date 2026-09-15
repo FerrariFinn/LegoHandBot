@@ -5,7 +5,7 @@ import { GoogleGenAI } from "@google/genai";
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const MODEL = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
-const MODEL_LIGHT = process.env.GEMINI_MODEL_LIGHT ?? "gemini-3.5-flash-lite";
+const MODEL_LIGHT = process.env.GEMINI_MODEL_LIGHT ?? "gemini-2.5-flash-lite";
 
 export type GenerateOptions = {
     systemInstruction: string;

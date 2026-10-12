@@ -7,7 +7,7 @@ const REFUSAL_RESPONSE =
     "Bro — Mich interressiert nur Bier und wie schnell der Legohandhalter es bekommt.";
 
 export const isRelevantQuery: PipelineStep = async (context) => {
-    // Leichtgewichtige LLM-Prüfung (gemini-2.5-flash-lite), ob die Frage überhaupt
+    // Leichtgewichtige LLM-Prüfung (gemini-3.5-flash-lite), ob die Frage überhaupt
     // einen Bezug zum LhGb hat. Spart das teure AnswerQuestion/ReadLegohandGesetzbuch
     // bei offensichtlich fachfremden Fragen.
     const raw = await generateText({

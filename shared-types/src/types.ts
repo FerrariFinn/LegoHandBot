@@ -1,3 +1,7 @@
+export type ChatRole = "user" | "assistant";
+
+export type ChatTurn = { role: ChatRole; text: string };
+
 export type ChatSource = { paragraph: string; title: string };
 
 /** Wählt zwischen den beiden Pipelines (QuestionQuery/CaseQuery, siehe
@@ -7,11 +11,11 @@ export type ChatMode = "frage" | "fall" | "lhgb";
 
 
 export type PipelineContext = {
-    role: "user" | "assistant";
+    role: ChatRole;
     query: string;
     chatmode: ChatMode;
     response?: string;
-    history?: { role: "user" | "assistant"; text: string }[];
+    history?: ChatTurn[];
     sources?: ChatSource[] | null;
     isRelevant?: boolean;
     gesetzbuchText?: string;

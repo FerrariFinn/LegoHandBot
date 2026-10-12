@@ -1,4 +1,4 @@
-import type { ChatMode, ChatSource } from "shared-types";
+import type { ChatMode, ChatRole, ChatSource } from "shared-types";
 
 // =====================================================================
 // Frontend-lokale Typen. Geteilte Vertragstypen (PipelineContext, ChatSource,
@@ -7,7 +7,7 @@ import type { ChatMode, ChatSource } from "shared-types";
 // =====================================================================
 
 export type UIMessage = {
-  role: "user" | "assistant";
+  role: ChatRole;
   text: string;
   mode?: ChatMode; // wird nur bei User-Nachrichten gesetzt
   sources?: ChatSource[] | null; // wird nur bei Assistant-Nachrichten gesetzt

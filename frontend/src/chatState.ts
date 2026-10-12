@@ -1,4 +1,4 @@
-import type { ChatMode, ChatSource } from "shared-types";
+import type { ChatMode, ChatSource, ChatTurn } from "shared-types";
 import type { UIMessage } from "./types";
 
 // =====================================================================
@@ -56,6 +56,6 @@ export function appendErrorText(
 
 export function toHistory(
   messages: UIMessage[]
-): { role: "user" | "assistant"; text: string }[] {
+): ChatTurn[] {
   return messages.map(({ role, text }) => ({ role, text }));
 }

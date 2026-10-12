@@ -11,7 +11,7 @@ const HOURLY_QUOTA = 5;
 export async function chatRateLimit(
   req: Request,
   res: Response,
-) {
+): Promise<boolean> {
   try {
     const client = supabaseAsUser(req.token!);
     const { data, error } = await client.rpc("check_and_increment_rate_limit", {
@@ -31,8 +31,10 @@ export async function chatRateLimit(
       return false;
     }
 
+    return true;
   } catch (err) {
     console.error("Rate-limit check hat geworfen:", err);
     res.status(500).json({ error: "Interner Fehler" });
+    return false;
   }
 }
